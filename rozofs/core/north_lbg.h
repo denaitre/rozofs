@@ -142,6 +142,7 @@ typedef struct _north_lbg_ctx_t
   int               nb_entries_conf;          /**< number of configured entries      */
   int               nb_active_entries;        /**< number of active entries          */
   int               next_entry_idx;           /**< index of the next enry to select  */
+  int             * next_global_entry_idx_p;  /**< index of the next entry in case it is shared between several lbg */
   generic_disc_CBK_t  userDiscCallBack;    /**< user disconnect call back (optional)        */
   generic_recv_CBK_t  userRcvCallBack;    /**< user receive call back (mandatory)        */
   uint8_t           entry_bitmap_state[NORTH__LBG_TB_MAX_ENTRY];

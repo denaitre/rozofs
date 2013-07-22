@@ -1122,6 +1122,36 @@ int north_lbg_configure_af_inet(int lbg_idx,char *name,
   return (lbg_p->index);
 
 }
+
+/*__________________________________________________________________________
+*/ 
+ /**
+*  API to configure a load balancing group.
+   The load balancing group must have been created previously with north_lbg_create_no_conf() 
+  
+ @param lbg_idx             Index of the load balancing group
+ @param next_global_entry_idx_p Pointer to the next lbg entry to select
+ 
+  @retval >= reference of the load balancer object
+  @retval < 0 error (out of context ??)
+*/
+int north_lbg_set_next_global_entry_idx_p(int lbg_idx, int * next_global_entry_idx_p)
+{
+  north_lbg_ctx_t  *lbg_p;
+  
+  lbg_p = north_lbg_getObjCtx_p(lbg_idx);
+  if (lbg_p == NULL) 
+  {
+    warning("north_lbg_set_next_global_entry_idx_p: no such instance %d ",lbg_idx);
+    return -1;
+  }
+
+  lbg_p->next_global_entry_idx_p = next_global_entry_idx_p;
+  * next_global_entry_idx_p = 0;
+
+  return 0;
+
+} 
  
 /*__________________________________________________________________________
 */ 
