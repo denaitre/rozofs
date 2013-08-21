@@ -42,23 +42,26 @@
 #include <rozofs/common/log.h>
 #include <rozofs/common/xmalloc.h>
 #include <rozofs/common/list.h>
+#include <rozofs/rozofs_srv.h>
 #include <rozofs/common/daemon.h>
 #include <rozofs/common/profile.h>
 #include <rozofs/rpc/mproto.h>
 #include <rozofs/rpc/sproto.h>
 #include <rozofs/rpc/spproto.h>
 #include <rozofs/core/rozofs_core_files.h>
-#include <rozofs/rozofs_timer_conf.h>
-#include <rozofs/rozofs_srv.h>
 
 #include "config.h"
 #include "sconfig.h"
 #include "storage.h"
 #include "storaged.h"
 #include "rbs.h"
+#include <rozofs/rozofs_timer_conf.h>
 #include "storaged_nblock_init.h"
 
 #define STORAGED_PID_FILE "storaged"
+
+
+char storage_process_filename[NAME_MAX];
 
 static char storaged_config_file[PATH_MAX] = STORAGED_DEFAULT_CONFIG;
 
@@ -133,7 +136,7 @@ out:
     return status;
 }
 
-static SVCXPRT *storaged_create_rpc_service(int port, char *host) {
+static SVCXPRT *storaged_create_rpc_service(int port, char *host, int instance) {
     int sock;
     int one = 1;
     struct sockaddr_in sin;
@@ -147,6 +150,9 @@ static SVCXPRT *storaged_create_rpc_service(int port, char *host) {
             return NULL;
         }
         bcopy((char *) hp->h_addr, (char *) &sin.sin_addr, hp->h_length);
+        uint32_t ipaddr = ntohl(sin.sin_addr.s_addr);
+        ipaddr += ((instance + 1) * 0x100);
+        sin.sin_addr.s_addr = htonl(ipaddr);
     } else {
         sin.sin_addr.s_addr = INADDR_ANY;
     }
@@ -289,7 +295,7 @@ static void rbs_process_initialize() {
 
             if ((storaged_profile_svc =
                     storaged_create_rpc_service(profil_rbs_port,
-                    storaged_hostname)) == NULL) {
+                    storaged_hostname, 0)) == NULL) {
                 fatal("can't create rebuild monitoring service on port: %d",
                         profil_rbs_port);
             }
@@ -348,10 +354,17 @@ storage_t *storaged_lookup(cid_t cid, sid_t sid) {
 out:
     return st;
 }
+/**
+ *  Signal catching
+ */
+static void storaged_remove_process_file(int sig) {
+    if (storage_process_filename[0] == 0) return;
+    unlink(storage_process_filename);
+}
 
 static void on_stop() {
     DEBUG_FUNCTION;
-
+    
     svc_exit();
 
     if (storaged_monitoring_svc) {
@@ -384,16 +397,6 @@ static void on_stop() {
 }
 
 
-char storage_process_filename[NAME_MAX];
-
-/**
- *  Signal catching
- */
-
-static void storaged_handle_signal(int sig) {
-    if (storage_process_filename[0] == 0) return;
-    unlink(storage_process_filename);
-}
 
 static void on_start() {
     int i = 0;
@@ -450,9 +453,9 @@ static void on_start() {
 
         // Create child process
         if (!(pid = fork())) {
-	
+
             rozofs_signals_declare("storio", 1);
-	    rozofs_attach_crash_cbk(storaged_handle_signal);
+	    rozofs_attach_crash_cbk(storaged_remove_process_file);
 
             char *pid_name_p = storage_process_filename;
             if (storaged_hostname != NULL) {
@@ -483,7 +486,7 @@ static void on_start() {
             // the portmap service
 
             if ((storaged_svc = storaged_create_rpc_service
-                    (storaged_storage_ports[i], storaged_hostname)) == NULL) {
+                    (storaged_storage_ports[i], storaged_hostname, i)) == NULL) {
                 fatal("can't create IO storaged service on port: %d",
                         storaged_storage_ports[i]);
             }
@@ -495,7 +498,7 @@ static void on_start() {
 
             if ((storaged_profile_svc = storaged_create_rpc_service
                     (storaged_storage_ports[i] + 1000,
-                    storaged_hostname)) == NULL) {
+                    storaged_hostname, 0)) == NULL) {
                 severe("can't create IO monitoring service on port: %d",
                         storaged_storage_ports[i] + 1000);
             }
@@ -587,8 +590,8 @@ int main(int argc, char *argv[]) {
     char pid_name[256];
     static struct option long_options[] = {
         { "help", no_argument, 0, 'h'},
-        { "config", required_argument, 0, 'c'},
-        { "rebuild", required_argument, 0, 'r'},
+        {"config", required_argument, 0, 'c'},
+        {"rebuild", required_argument, 0, 'r'},
         { "host", required_argument, 0, 'H'},
         { 0, 0, 0, 0}
     };
