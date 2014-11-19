@@ -19,21 +19,33 @@ _rozo()
     #
     case "${prev}" in
     agent)
+        local subopts="status start stop restart"
+        COMPREPLY=( $(compgen -W "${subopts}" -- ${cur}) )
         return 0
         ;;
     layout)
+        local subopts="get set"
+        COMPREPLY=( $(compgen -W "${subopts}" -- ${cur}) )
         return 0
         ;;
     node)
+        local subopts="list status config start stop rebuild"
+        COMPREPLY=( $(compgen -W "${subopts}" -- ${cur}) )
         return 0
         ;;
     volume)
+        local subopts="list stat get expand remove"
+        COMPREPLY=( $(compgen -W "${subopts}" -- ${cur}) )
         return 0
         ;;
     export)
+        local subopts="list create update remove get mount umount"
+        COMPREPLY=( $(compgen -W "${subopts}" -- ${cur}) )
         return 0
         ;;
     storage)
+        local subopts="list get add remove"
+        COMPREPLY=( $(compgen -W "${subopts}" -- ${cur}) )
         return 0
         ;;
     *)
