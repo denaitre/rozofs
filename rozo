@@ -1,15 +1,49 @@
 
 _rozo()
 {
-    local cur prev
+    local cur prev opts base
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="--version --debug --help"
 
-    if [[ ${cur} == -* ]] ; then
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+    #opts="--version --debug --help"
+    opts="agent layout node volume export storage --version --debug --help"
+
+#    if [[ ${cur} == -* ]] ; then
+#        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+#        return 0
+#    fi
+
+    #
+    #  Complete the arguments to some of the basic commands.
+    #
+    case "${prev}" in
+    agent)
         return 0
-    fi
+        ;;
+    layout)
+        return 0
+        ;;
+    node)
+        return 0
+        ;;
+    volume)
+        return 0
+        ;;
+    export)
+        return 0
+        ;;
+    storage)
+        return 0
+        ;;
+    *)
+        ;;
+    esac
+#    local running=$(for x in `xm list --long | grep \(name | grep -v Domain-0 | awk '{ print $2 }' | tr -d \)`; do echo ${x} ; done )
+#        COMPREPLY=( $(compgen -W "${running}" -- ${cur}) )
+#            return 0
+ 
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+    return 0
 }
 complete -F _rozo rozo
