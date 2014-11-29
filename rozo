@@ -1,6 +1,7 @@
 # rozo <topic> <options> (<parameters>) (<more_options&parameters>) [-E host]
 
-topics="agent layout node volume export storage"
+general="-V --version -d --debug -h --help"
+topics="agent layout node volume export storage ${general}"
 
 layouts="0 1 2"
 roles="exportd storaged rozofsmount"
@@ -11,6 +12,7 @@ pacemaker="-p --pacemaker"
 listener="-l --listener"
 role="-r --roles"
 node="-n --nodes"
+single_node="-n --node"
 volume="-v --vid"
 layout="-l --layout"
 name="-n --name"
@@ -24,6 +26,21 @@ mount_option="-o --options"
 interface="-i --interface"
 port="-p --port"
 help="-h --help"
+
+
+__multi_hosts()
+{
+    for host in $hostnames; do
+        case "${prev}" in
+            ${host})
+                local rob="${hostnames} $@"
+                COMPREPLY=( $(compgen -W "${rob}" -- ${cur}) )
+                return 0
+        esac
+    done
+    return 1
+}
+
 
 _rozo()
 {
@@ -95,8 +112,9 @@ _rozo()
         ### rebuild  [-r  |  --roles role...] -E | --exportd host...
         local opts="list status config start stop rebuild"
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+
         case "${prev}" in 
-            -n | --node)
+            -n | --node | --nodes)
                 COMPREPLY=($(compgen -A hostname "$cur") )
                 return 0
                 ;;
@@ -111,14 +129,19 @@ _rozo()
                 return 0
                 ;;
             status | config | start | stop)
-                COMPREPLY=( $(compgen -W "${role} ${node} ${export}" -- ${cur}) )
+                # The following allows multiple hostnames
+                o="${role} ${export}"
+                if ! __multi_hosts $o; then
+                    COMPREPLY=( $(compgen -W "$o ${node}" -- ${cur}) )
+                fi
                 return 0
                 ;;
             rebuild)
-                COMPREPLY=( $(compgen -W "${node} ${export}" -- ${cur}) )
+                COMPREPLY=( $(compgen -W "${single_node} ${export}" -- ${cur}) )
                 return 0
                 ;;
         esac
+
         return 0
         ;;
     volume)
@@ -126,10 +149,6 @@ _rozo()
         local opts="list stat get expand remove"
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
         case "${prev}" in 
-            -n | --node | -E | --exportd)
-                COMPREPLY=($(compgen -A hostname "$cur") )
-                return 0
-                ;;
             -r | --role)
                 COMPREPLY=( $(compgen -W "${roles}" -- ${cur}) )
                 return 0
@@ -160,6 +179,7 @@ _rozo()
         ### umount  -E  | --exportd host...
         local opts="list create update remove get mount umount"
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+
         case "${prev}" in 
             -n | --node | -E | --exportd)
                 COMPREPLY=($(compgen -A hostname "$cur") )
@@ -188,11 +208,17 @@ _rozo()
                 return 0
                 ;;
             mount)
-                COMPREPLY=( $(compgen -W "${node} ${eid} ${mount_option} ${export}" -- ${cur}) )
+                o="${eid} ${mount_option} ${export}"
+                if ! __multi_hosts $o; then
+                    COMPREPLY=( $(compgen -W "$o ${node}" -- ${cur}) )
+                fi
                 return 0
                 ;;
             umount)
-                COMPREPLY=( $(compgen -W "${node} ${eid} ${export}" -- ${cur}) )
+                o="${eid} ${export}"
+                if ! __multi_hosts $o; then
+                    COMPREPLY=( $(compgen -W "$o ${node}" -- ${cur}) )
+                fi
                 return 0
                 ;;
         esac
@@ -201,6 +227,7 @@ _rozo()
     storage)
         local opts="list get add remove"
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+
         case "${prev}" in 
             -n | --node | -E | --exportd)
                 COMPREPLY=($(compgen -A hostname "$cur") )
@@ -217,23 +244,22 @@ _rozo()
                 return 0
                 ;;
             add | remove)
-                COMPREPLY=( $(compgen -W "${node} ${interface} ${port} ${export}" -- ${cur}) )
+                o="${interface} ${port} ${export}"
+                if ! __multi_hosts $o; then
+                    COMPREPLY=( $(compgen -W "$o ${node}" -- ${cur}) )
+                fi
                 return 0
                 ;;
         esac
         return 0
         ;;
-#    *)
-#         -E | --export are neither involved at the beginning of the command
-#         neither when the topic is 'agent'
-#        if [ -z ${COMP_WORDS[3]+x} ] || [ "agent" == "${COMP_WORDS[1]}" ]; then
-#            local opts="-h --help"
-#        else
-#            local opts="-E --export -h --help"
-#        fi
-#        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-#        return 0
-#        ;;
+    *)
+        local opts="-h --help"
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        return 0
+        ;;
     esac
 }
+
+
 complete -F _rozo rozo
