@@ -1,6 +1,8 @@
 *.[oa]
 *.pyc
+*.swp
 
+build
 CMakeFiles
 Makefile
 cmake_install.cmake
