@@ -120,7 +120,7 @@ _rozo()
                 COMPREPLY=($(compgen -A hostname "$cur") )
                 return 0
                 ;;
-            -r | --role)
+            -r | --roles)
                 COMPREPLY=( $(compgen -W "${roles}" -- ${cur}) )
                 return 0
                 ;;
@@ -150,12 +150,6 @@ _rozo()
         ### rozo volume list | stat | get | expand | remove -E | --exportd host...
         local opts="list stat get expand remove"
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-        case "${prev}" in 
-            -r | --role)
-                COMPREPLY=( $(compgen -W "${roles}" -- ${cur}) )
-                return 0
-                ;;
-        esac
         case "${option}" in 
             list | stat)
                 COMPREPLY=( $(compgen -W "${export}" -- ${cur}) )
