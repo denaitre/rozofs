@@ -96,5 +96,6 @@ install(TARGETS storio
 )
 install(FILES storage.conf.sample DESTINATION ${ROZOFS_CONFIG_DIR} COMPONENT storage)
 install(FILES storage.conf DESTINATION ${ROZOFS_CONFIG_DIR} COMPONENT storage)
+install(FILES rozofs-storaged DESTINATION /etc/bash_completion.d/ COMPONENT storage)
 
 install(PROGRAMS storio_starter.sh storio_killer.sh  DESTINATION bin)

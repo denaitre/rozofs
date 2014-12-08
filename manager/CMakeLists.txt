@@ -28,4 +28,7 @@ if (NOT PYTHON_NOTFOUND)
 
     install(CODE "execute_process (COMMAND cmake -DSETUP=${CMAKE_BINARY_DIR}/manager/setup.py -DDEBIAN=${DEBIAN_LAYOUT} -DPREFIX=${CMAKE_INSTALL_PREFIX} -DMANIFEST=${PROJECT_BINARY_DIR}/manager_install_manifest.txt -DWDIR=${CMAKE_CURRENT_BINARY_DIR} -P ${PROJECT_SOURCE_DIR}/cmake/setup.cmake)")
 
+# deploy the bash completion file for rozo
+install(FILES rozo DESTINATION /etc/bash_completion.d/ COMPONENT manager)
+
 endif(NOT PYTHON_NOTFOUND)

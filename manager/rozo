@@ -1,3 +1,5 @@
+# bash completion file for the RozoFS manager tool *rozo*
+#
 # rozo <topic> <options> (<parameters>) (<more_options&parameters>) [-E host]
 
 general="-V --version -d --debug -h --help"

@@ -1,0 +1,30 @@
+# bash completion file for the RozoFS service *storaged*
+
+
+_storaged()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    opts="-h --help -c --config -r --rebuild -m --multiio"
+
+    case "${prev}" in
+    -c | --config)
+        COMPREPLY=( $(compgen -f ${cur}) )
+        return 0
+        ;;
+    -r | --rebuild)
+        COMPREPLY=($(compgen -A hostname "$cur") )
+        return 0
+        ;;
+    *)
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        return 0
+        ;;
+    esac
+}
+
+
+complete -F _storaged storaged

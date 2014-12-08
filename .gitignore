@@ -1,6 +1,7 @@
 *.[oa]
 *.pyc
 *.swp
+*.swo
 
 build
 CMakeFiles

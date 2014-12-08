@@ -22,9 +22,6 @@ install(FILES exportd.8 DESTINATION share/man/man8 COMPONENT export)
 install(FILES export.conf.5 DESTINATION share/man/man5 COMPONENT export)
 install(FILES rozo.1 DESTINATION share/man/man1 COMPONENT manager)
 
-install(FILES rozo DESTINATION /etc/bash_completion.d/ COMPONENT manager)
-install(FILES rozofs DESTINATION /etc/bash_completion.d/)
-
 #
 # add doxygen target
 #

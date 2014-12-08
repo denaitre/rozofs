@@ -1,0 +1,40 @@
+# bash completion file for the RozoFS service *rozofsmount*
+
+_rozofsmount()
+{
+    ### rozofsmount  [-f]  [-H  EXPORT_HOST]  [-E  EXPORT_PATH] [-P EXPORT_PASSWD]
+    ### [-o opt[,opt]...]  mountpoint
+
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    general="-h --help -V --version"
+    fuse="-f"
+    rozofs="-H -E -o"
+    opts="${general} ${fuse} ${rozofs}"
+
+    options="exporthost= exportpath= exportpasswd= rozofsbufsize="
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+
+    for ((i=1;i<COMP_CWORD;i++)); do 
+      if [ "-o" == "${COMP_WORDS[i]}" ]; then 
+        COMPREPLY=( $(compgen -W "${options} ${rozofs}" -- ${cur}) )
+      fi 
+    done 
+
+    case "${prev}" in
+    -E)
+        COMPREPLY=( $(compgen -f ${cur}) )
+        return 0
+        ;;
+    -H)
+        COMPREPLY=($(compgen -A hostname "$cur") )
+        return 0
+        ;;
+    esac
+}
+
+complete -F _rozofsmount rozofsmount

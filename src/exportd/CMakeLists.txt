@@ -103,3 +103,4 @@ install(TARGETS exportd
 
 install(FILES export.conf.sample DESTINATION ${ROZOFS_CONFIG_DIR} COMPONENT export)
 install(FILES export.conf DESTINATION ${ROZOFS_CONFIG_DIR} COMPONENT export)
+install(FILES rozofs-exportd DESTINATION /etc/bash_completion.d/ COMPONENT export)
