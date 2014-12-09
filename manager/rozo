@@ -177,7 +177,7 @@ _rozo()
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 
         case "${prev}" in 
-            -n | --node | -E | --exportd)
+            -n | --nodes | -E | --exportd)
                 COMPREPLY=($(compgen -A hostname "$cur") )
                 return 0
                 ;;
@@ -225,7 +225,7 @@ _rozo()
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 
         case "${prev}" in 
-            -n | --node | -E | --exportd)
+            -n | --nodes | -E | --exportd)
                 COMPREPLY=($(compgen -A hostname "$cur") )
                 return 0
                 ;;
