@@ -14,14 +14,14 @@ _rozofsmount()
 
     general="-h --help -V --version"
     fuse="-f"
-    rozofs="-H -E -o"
+    rozofs="-H -E -P -o"
     opts="${general} ${fuse} ${rozofs}"
 
     COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 
     for ((i=1;i<COMP_CWORD;i++)); do 
       if [ "-o" == "${COMP_WORDS[i]}" ]; then 
-        COMPREPLY=( $(compgen -W "${options} -H -E" -- ${cur}) )
+        COMPREPLY=( $(compgen -W "${options} -H -E -P" -- ${cur}) )
       fi 
     done 
 
