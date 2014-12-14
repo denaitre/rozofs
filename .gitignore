@@ -1,5 +1,8 @@
 *.[oa]
 *.pyc
+build/
+*.swp
+*.swo
 
 CMakeFiles
 Makefile
