@@ -1,5 +1,7 @@
 # bash completion file for the RozoFS service *rozofsmount*
 
+options=`rozofsmount -h 2> >(awk '$1=="-o"{c++; if(c>1){print $2}}') | sed 's/=.*/=/'`
+
 _rozofsmount()
 {
     ### rozofsmount  [-f]  [-H  EXPORT_HOST]  [-E  EXPORT_PATH] [-P EXPORT_PASSWD]
@@ -15,13 +17,11 @@ _rozofsmount()
     rozofs="-H -E -o"
     opts="${general} ${fuse} ${rozofs}"
 
-    options="exporthost= exportpath= exportpasswd= rozofsbufsize="
-
     COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 
     for ((i=1;i<COMP_CWORD;i++)); do 
       if [ "-o" == "${COMP_WORDS[i]}" ]; then 
-        COMPREPLY=( $(compgen -W "${options} ${rozofs}" -- ${cur}) )
+        COMPREPLY=( $(compgen -W "${options} -H -E" -- ${cur}) )
       fi 
     done 
 
